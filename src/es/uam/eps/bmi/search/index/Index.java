@@ -6,6 +6,8 @@
 package es.uam.eps.bmi.search.index;
 
 import es.uam.eps.bmi.search.index.freq.FreqVector;
+import java.io.IOException;
+import java.util.List;
 
 /**
  *
@@ -14,11 +16,17 @@ import es.uam.eps.bmi.search.index.freq.FreqVector;
 public interface Index {
     
     
-    public String[] getAllTerms();
+    public List<String> getAllTerms() throws IOException ;
             
-    public String[] getTotalFreq(String term);
+    public long getTotalFreq(String term) throws IOException;
     
-    public FreqVector getDocVector(int id);
+    public FreqVector getDocVector(int id) throws IOException;
+    
+    public String getDocPath(int docID) throws IOException;
+    
+    public long getTermFreq(String term, int docID) throws IOException;
+    
+    public long getDocFreq(String term) throws IOException;
     
     
 }
