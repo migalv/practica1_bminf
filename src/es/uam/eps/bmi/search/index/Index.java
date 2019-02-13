@@ -15,7 +15,6 @@ import java.util.List;
  */
 public interface Index {
     
-    
     public List<String> getAllTerms() throws IOException ;
             
     public long getTotalFreq(String term) throws IOException;
