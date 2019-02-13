@@ -31,7 +31,7 @@ public class TestEngine {
         File f = new File("src/es/uam/eps/bmi/search/ranking");
         System.out.println(f.getAbsolutePath());
         System.out.println(f.isDirectory() ? "true" : "false");
-        testCollection ("src/es/uam/eps/bmi/search/ranking/", "index/src", "size", "public abstract");
+        //testCollection ("src/es/uam/eps/bmi/search/ranking/", "index/src", "size", "public abstract");
         testCollection ("collections/docs1k.zip", "index/docs", "seat", "obama family tree");
         testCollection ("collections/urls.txt", "index/urls", "wikipedia", "information probability");
     }
