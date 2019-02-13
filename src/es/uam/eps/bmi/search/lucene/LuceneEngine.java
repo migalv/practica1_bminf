@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -21,12 +20,12 @@ public class LuceneEngine extends AbstractEngine{
     
     public LuceneEngine(String indexPath) throws IOException {
         super(new LuceneIndex(indexPath));
-        searcher = new IndexSearcher();
+        searcher = new IndexSearcher(((LuceneIndex) this.index).getIndex());
         parser = new QueryParser("content", new StandardAnalyzer());
-        
         
     }
 
+    @Override
     public SearchRanking search(String query, int cutoff) throws IOException{
         Query q=null;
         try {
@@ -36,6 +35,6 @@ public class LuceneEngine extends AbstractEngine{
         }
         ScoreDoc result[] = searcher.search(q, cutoff).scoreDocs;
         
-        return new LuceneRanking(result);
+        return new LuceneRanking(this.index,result);
     }
 }

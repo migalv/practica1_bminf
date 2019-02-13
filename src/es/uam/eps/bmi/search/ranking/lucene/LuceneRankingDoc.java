@@ -9,14 +9,15 @@ import org.apache.lucene.search.ScoreDoc;
  *
  * @author pablo
  */
-public class LuceneRankingDoc extends SearchRankingDoc {
+public class LuceneRankingDoc extends SearchRankingDoc{
     Index index;
     ScoreDoc rankedDoc;
     
-    LuceneRankingDoc (Index idx, ScoreDoc r) {
+    public LuceneRankingDoc (Index idx, ScoreDoc r) {
         index = idx;
         rankedDoc = r;
     }
+    
     public double getScore() {
         return rankedDoc.score;
     }
