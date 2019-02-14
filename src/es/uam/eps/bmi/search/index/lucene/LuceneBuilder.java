@@ -43,7 +43,7 @@ public class LuceneBuilder implements IndexBuilder{
     
     @Override
     public void build(String collectionPath, String indexPath) throws IOException {
-        Directory directory = FSDirectory.open(Paths.get("res/index"));
+        Directory directory = FSDirectory.open(Paths.get(indexPath));
         boolean rebuild = true;
         analyzer = new StandardAnalyzer();
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
@@ -69,11 +69,9 @@ public class LuceneBuilder implements IndexBuilder{
             
             // Leemos las urls del archivo y parseamos el html
             while ((url = br.readLine()) != null){
-                // Guardamos el contenido html parseado en la lista
-                content.add(Jsoup.parse(new URL(url), 10000).text());
-                // Guardamos su path como la url
-                paths.add(url);
+                this.addToIndex(Jsoup.parse(new URL(url), 10000).text(), url, builder);
             }
+            
         } // Si es un zip, por cada fichero del zip lo leemos 
         else if(collectionPath.endsWith(".zip")){
             // Abrimos el zipfile
@@ -84,7 +82,7 @@ public class LuceneBuilder implements IndexBuilder{
             StringBuilder stringBuilder = new StringBuilder();
             // Cada linea del fichero
             String line;
-            
+                        
             // Recorremos lalista de entradas (ficheros) del zip
             while(entries.hasMoreElements()){
                 // Recuperamos la entrada
@@ -99,11 +97,10 @@ public class LuceneBuilder implements IndexBuilder{
                     while ((line = br.readLine()) != null) {
                             stringBuilder.append(line);
                     }
-                    // Parseamos y añadimos el contenido html
-                    content.add(Jsoup.parse(stringBuilder.toString()).text());
-                    // Guardamos su path como el nombre del fichero
-                    paths.add(collectionPath + "/" + entry.getName());
+                    this.addToIndex(Jsoup.parse(stringBuilder.toString()).text(), collectionPath + entry.getName(), builder);
+
                 }
+                
             }              
         } // Si no es nada de lo otro entonces es un directorio
           // y vamos archivo a archivo 
@@ -123,30 +120,29 @@ public class LuceneBuilder implements IndexBuilder{
                     while ((line = br.readLine()) != null) {
                             stringBuilder.append(line);
                     }
-                    // Parseamos y añadimos el contenido html
-                    content.add(Jsoup.parse(stringBuilder.toString()).text());
-                    // Guardamos su path como el nombre del fichero
-                    paths.add(collectionPath + "/" + fileEntry.getName());
+                    this.addToIndex(Jsoup.parse(stringBuilder.toString()).text(), collectionPath + fileEntry.getName(), builder);
+
                 } 
             }   
         
         }
-        // convertimos el html parseado y el path a documentos para añadirlos al indice
-        // recorre el html parseado y los paths
-        for(int i = 0; i < content.size(); i++){
-            // Creamos un documento por cada entrada en la lista content
-            Document doc = new Document();
-            // Añadimos el path al documento
-            doc.add(new TextField("path", paths.get(i), Field.Store.YES));
-            FieldType type = new FieldType();
-            type.setIndexOptions (IndexOptions.DOCS_AND_FREQS);
-            type.setStoreTermVectors(true);
-            // Añadimos el html parseado al documento
-            doc.add(new Field("content", content.get(i), type));
-            // Añadimos el documento al indice
-            builder.addDocument(doc);
-        }
         builder.close();
+        
+    }
+    
+    public void addToIndex(String content, String path,IndexWriter builder) throws IOException{
+
+        // Creamos un documento por cada entrada en la lista content
+        Document doc = new Document();
+        // Añadimos el path al documento
+        doc.add(new TextField("path", path, Field.Store.YES));
+        FieldType type = new FieldType();
+        type.setIndexOptions (IndexOptions.DOCS_AND_FREQS);
+        type.setStoreTermVectors(true);
+        // Añadimos el html parseado al documento
+        doc.add(new Field("content", content, type));
+        // Añadimos el documento al indice
+        builder.addDocument(doc);
     }
     
 }
