@@ -3,14 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/alumnos/e341058/worspace/practica1/src/es/uam/eps/bmi/search/index/lucene/LuceneBuilder.java</file>
-            <file>file:/home/alumnos/e341058/worspace/practica1/src/es/uam/eps/bmi/search/lucene/LuceneEngine.java</file>
-            <file>file:/home/alumnos/e341058/worspace/practica1/src/es/uam/eps/bmi/search/ranking/lucene/LuceneRanking.java</file>
-            <file>file:/home/alumnos/e341058/worspace/practica1/src/es/uam/eps/bmi/search/index/IndexBuilder.java</file>
-            <file>file:/home/alumnos/e341058/worspace/practica1/src/es/uam/eps/bmi/search/ranking/SearchRanking.java</file>
-            <file>file:/home/alumnos/e341058/worspace/practica1/src/es/uam/eps/bmi/search/index/lucene/LuceneIndex.java</file>
-            <file>file:/home/alumnos/e341058/worspace/practica1/src/es/uam/eps/bmi/search/index/Index.java</file>
-            <file>file:/home/alumnos/e341058/worspace/practica1/src/es/uam/eps/bmi/search/ranking/SearchRankingDoc.java</file>
+            <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/AbstractEngine.java</file>
+            <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/index/lucene/LuceneBuilder.java</file>
+            <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/vsm/VSMEngine.java</file>
         </group>
     </open-files>
 </project-private>
