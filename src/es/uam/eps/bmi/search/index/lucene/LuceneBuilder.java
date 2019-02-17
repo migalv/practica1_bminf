@@ -7,11 +7,11 @@ package es.uam.eps.bmi.search.index.lucene;
 
 import es.uam.eps.bmi.search.index.IndexBuilder;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -52,6 +52,7 @@ public class LuceneBuilder implements IndexBuilder{
         // Lista con el nombre del documento o Url
         ArrayList<String> paths = new ArrayList<>();
         IndexWriter builder;
+        File file = new File(collectionPath);
         
         if (rebuild)
             config.setOpenMode(OpenMode.CREATE);
@@ -63,7 +64,6 @@ public class LuceneBuilder implements IndexBuilder{
         // Si el archivo es un txt leemos linea a linea
         // donde cada linea es una url
         if(collectionPath.endsWith(".txt")){
-            File file = new File(collectionPath);
             BufferedReader br = new BufferedReader(new FileReader(file));             
             String url;
             
@@ -78,10 +78,9 @@ public class LuceneBuilder implements IndexBuilder{
             ZipFile zipFile = new ZipFile(collectionPath);
             // Recuperamos las entradas del zip file
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            // Creamos un stringbuilder para leer la entrada (fichero) del zipfile
-            StringBuilder stringBuilder = new StringBuilder();
+            
             // Cada linea del fichero
-            String line;
+            int len;
                         
             // Recorremos lalista de entradas (ficheros) del zip
             while(entries.hasMoreElements()){
@@ -92,13 +91,13 @@ public class LuceneBuilder implements IndexBuilder{
                 if(!entry.isDirectory()){
                     // Abrimos el achivo
                     InputStream stream = zipFile.getInputStream(entry);
-                    BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+                    ByteArrayOutputStream result = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];
                     // Leemos el fichero
-                    while ((line = br.readLine()) != null) {
-                            stringBuilder.append(line);
+                    while ((len = stream.read(buffer, 0, buffer.length)) > 0) {
+                            result.write(buffer, 0, len);
                     }
-                    this.addToIndex(Jsoup.parse(stringBuilder.toString()).text(), collectionPath + entry.getName(), builder);
-
+                    this.addToIndex(Jsoup.parse(result.toString("UTF-8")).text(), file.getAbsolutePath() + File.separator + entry.getName(), builder);
                 }
                 
             }              
@@ -120,7 +119,7 @@ public class LuceneBuilder implements IndexBuilder{
                     while ((line = br.readLine()) != null) {
                             stringBuilder.append(line);
                     }
-                    this.addToIndex(Jsoup.parse(stringBuilder.toString()).text(), collectionPath + fileEntry.getName(), builder);
+                    this.addToIndex(Jsoup.parse(stringBuilder.toString()).text(), file.getAbsolutePath() + File.separator + fileEntry.getName(), builder);
 
                 } 
             }   

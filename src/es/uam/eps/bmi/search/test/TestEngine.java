@@ -33,7 +33,7 @@ public class TestEngine {
         System.out.println(f.getAbsolutePath());
         System.out.println(f.isDirectory() ? "true" : "false");
         testCollection ("src/es/uam/eps/bmi/search/ranking/", "index/src", "size", "public abstract");
-        //testCollection ("collections/docs1k.zip", "index/docs", "seat", "obama family tree");
+        testCollection ("collections/docs1k.zip", "index/docs", "seat", "obama family tree");
         testCollection ("collections/urls.txt", "index/urls", "wikipedia", "information probability");
     }
     
@@ -86,7 +86,7 @@ public class TestEngine {
         System.out.println("Checking search results");
 
         testSearch (new LuceneEngine(indexPath), query, 5);
-        testSearch (new VSMEngine(new LuceneIndex(indexPath)), query, 5);
+        //testSearch (new VSMEngine(new LuceneIndex(indexPath)), query, 5);
     }
     
     static void testSearch (SearchEngine engine, String query, int cutoff) throws IOException {
