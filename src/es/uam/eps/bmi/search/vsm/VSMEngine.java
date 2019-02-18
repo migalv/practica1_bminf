@@ -7,7 +7,10 @@ package es.uam.eps.bmi.search.vsm;
 
 import es.uam.eps.bmi.search.AbstractEngine;
 import es.uam.eps.bmi.search.index.Index;
+<<<<<<< HEAD
 import es.uam.eps.bmi.search.index.lucene.LuceneIndex;
+=======
+>>>>>>> f3cc5da8d2288a1e9f1316813a4adafc8391d21a
 import es.uam.eps.bmi.search.ranking.SearchRanking;
 import es.uam.eps.bmi.search.ranking.impl.ScoreDocImpl;
 import es.uam.eps.bmi.search.ranking.impl.SearchRankingImpl;
@@ -26,11 +29,16 @@ public class VSMEngine extends AbstractEngine{
     public List<ScoreDocImpl> scoreDocs;
     String[] queryTerms;
     
+<<<<<<< HEAD
     public VSMEngine(Index idx) throws IOException {
+=======
+    public VSMEngine(Index idx) {
+>>>>>>> f3cc5da8d2288a1e9f1316813a4adafc8391d21a
         super(idx);
     }
 
     @Override
+<<<<<<< HEAD
     public SearchRanking search(String query, int cutoff) throws IOException{
         scoreDocs = new ArrayList<>();
         int numDocs = ((LuceneIndex)index).getIndex().numDocs();
@@ -51,6 +59,11 @@ public class VSMEngine extends AbstractEngine{
         for(int i=0; i< max;i++){
             scoreFinal[i]=scoreDocs.get(i);
         }
+=======
+    public SearchRanking search(String query, int cutoff) throws IOException {
+        return null;
+    }
+>>>>>>> f3cc5da8d2288a1e9f1316813a4adafc8391d21a
 
         return new SearchRankingImpl(this.index, scoreFinal);
     }
