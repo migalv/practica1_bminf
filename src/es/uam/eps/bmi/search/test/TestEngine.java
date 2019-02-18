@@ -85,7 +85,7 @@ public class TestEngine {
         System.out.println("Checking search results");
 
         testSearch (new LuceneEngine(indexPath), query, 5);
-        //testSearch (new VSMEngine(new LuceneIndex(indexPath)), query, 5);
+        testSearch (new VSMEngine(new LuceneIndex(indexPath)), query, 5);
     }
     
     static void testSearch (SearchEngine engine, String query, int cutoff) throws IOException {
