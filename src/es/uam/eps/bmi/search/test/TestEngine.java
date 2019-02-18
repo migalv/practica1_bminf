@@ -8,7 +8,6 @@ import es.uam.eps.bmi.search.index.freq.TermFreq;
 import es.uam.eps.bmi.search.index.lucene.LuceneIndex;
 import es.uam.eps.bmi.search.index.lucene.LuceneBuilder;
 import es.uam.eps.bmi.search.lucene.LuceneEngine;
-//import es.uam.eps.bmi.search.vsm.VSMEngine;
 import es.uam.eps.bmi.search.ranking.SearchRanking;
 import es.uam.eps.bmi.search.ranking.SearchRankingDoc;
 import es.uam.eps.bmi.search.ui.TextResultDocRenderer;
@@ -33,7 +32,7 @@ public class TestEngine {
         System.out.println(f.getAbsolutePath());
         System.out.println(f.isDirectory() ? "true" : "false");
         testCollection ("src/es/uam/eps/bmi/search/ranking/", "index/src", "size", "public abstract");
-        //testCollection ("collections/docs1k.zip", "index/docs", "seat", "obama family tree");
+        testCollection ("collections/docs1k.zip", "index/docs", "seat", "obama family tree");
         testCollection ("collections/urls.txt", "index/urls", "wikipedia", "information probability");
     }
     

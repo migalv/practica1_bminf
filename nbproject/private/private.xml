@@ -5,7 +5,13 @@
         <group>
             <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/AbstractEngine.java</file>
             <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/index/lucene/LuceneBuilder.java</file>
+            <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/index/lucene/LuceneIndex.java</file>
+            <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/ranking/impl/ModeloVectorialImpl.java</file>
+            <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/ranking/impl/ScoreDocImpl.java</file>
+            <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/index/Index.java</file>
             <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/vsm/VSMEngine.java</file>
+            <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/test/TestEngine.java</file>
+            <file>file:/home/sergio/practica1/src/es/uam/eps/bmi/search/test/TermStats.java</file>
         </group>
     </open-files>
 </project-private>
