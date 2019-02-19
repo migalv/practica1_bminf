@@ -1,20 +1,31 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * 
+ * Fichero ScoreDocImpl.java.
+ * 
+ * 
+ * @version 1.0
+ * 
+ * Created on 11/02/2019  
  */
 package es.uam.eps.bmi.search.ranking.impl;
 
-import static org.apache.lucene.search.similarities.SimilarityBase.log2;
-
 /**
+ * Clase ScoreDocImpl que tiene un documento y su respectiva puntuacion.
  *
- * @author sergio
+ * @author Miguel Alvarez Lesmes
+ * @author Sergio Romero Tapiador
+ * 
  */
 public class ScoreDocImpl {
     public float score;
     public int doc;
 
+    /**
+     * Constructor de ScoreDocImpl
+     * 
+     * @param doc el documento 
+     * @param score la puntuacion del documento
+     */
     public ScoreDocImpl(int doc, float score) {
         this.score= score;
         this.doc=doc;
