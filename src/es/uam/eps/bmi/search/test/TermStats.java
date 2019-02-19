@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 public class TermStats {
     
     public static void main (String args[]) throws IOException {
-        LuceneIndex index = new LuceneIndex("index/src");
+        LuceneIndex index = new LuceneIndex("index/docs");
         //LuceneIndex index = new LuceneIndex("index/urls");
 
         List<String> allTerms = new ArrayList<>(index.getAllTerms());
@@ -34,19 +34,17 @@ public class TermStats {
             termMap.put(term, (int)index.getTotalFreq(term));
         }
         
-        BufferedWriter file = Files.newBufferedWriter(Paths.get("./termfreq.txt"));
-                
-        termMap.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed()).forEach((t)->{try {
-            String str=t.getKey()+"\t"+t.getValue()+"\n" ;
-            file.write(str);
-            System.out.println(str);
+        try (BufferedWriter file = Files.newBufferedWriter(Paths.get("./termfreq.txt"))) {
+            termMap.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed()).forEach((t)->{try {
+                String str=t.getKey()+"\t"+t.getValue()+"\n" ;
+                file.write(str);
             } catch (IOException ex) {
                 Logger.getLogger(TermStats.class.getName()).log(Level.SEVERE, null, ex);
             }
-        
-        
-        });
-        file.close();
+            
+            
+            });
+        }
 
         Map <String, Integer> termDocMap = new HashMap<>();
 
@@ -54,19 +52,17 @@ public class TermStats {
             termDocMap.put(term, (int)index.getDocFreq(term));
         }
         
-        BufferedWriter fileDoc = Files.newBufferedWriter(Paths.get("./termdocfreq.txt"));
-                
-        termDocMap.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed()).forEach((d)->{try {
-            String str=d.getKey()+"\t"+d.getValue()+"\n" ;
-            fileDoc.write(str);
-            System.out.println(str);
+        try (BufferedWriter fileDoc = Files.newBufferedWriter(Paths.get("./termdocfreq.txt"))) {
+            termDocMap.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed()).forEach((d)->{try {
+                String str=d.getKey()+"\t"+d.getValue()+"\n" ;
+                fileDoc.write(str);
             } catch (IOException ex) {
                 Logger.getLogger(TermStats.class.getName()).log(Level.SEVERE, null, ex);
             }
-        
-        
-        });
-        fileDoc.close();
+            
+            
+            });
+        }
 
         
     }

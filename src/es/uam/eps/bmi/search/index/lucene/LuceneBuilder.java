@@ -6,16 +6,27 @@
 package es.uam.eps.bmi.search.index.lucene;
 
 import es.uam.eps.bmi.search.index.IndexBuilder;
+import es.uam.eps.bmi.search.index.freq.FreqVector;
+import es.uam.eps.bmi.search.index.freq.TermFreq;
+import es.uam.eps.bmi.search.vsm.VSMEngine;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.apache.lucene.analysis.Analyzer;
@@ -28,6 +39,7 @@ import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import static org.apache.lucene.search.similarities.SimilarityBase.log2;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.jsoup.Jsoup;
@@ -40,12 +52,17 @@ import org.jsoup.Jsoup;
 public class LuceneBuilder implements IndexBuilder{
     
     Analyzer analyzer;
+    LuceneIndex index;
+    private Map<Integer, Float> modulos;
+
+    
     
     @Override
     public void build(String collectionPath, String indexPath) throws IOException {
         Directory directory = FSDirectory.open(Paths.get(indexPath));
         boolean rebuild = true;
         analyzer = new StandardAnalyzer();
+        
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         // Lista con el contenido parseado html de los documentos
         ArrayList<String> content = new ArrayList<>();
@@ -126,6 +143,7 @@ public class LuceneBuilder implements IndexBuilder{
         
         }
         builder.close();
+        createModulo(indexPath);
         
     }
     
@@ -142,6 +160,56 @@ public class LuceneBuilder implements IndexBuilder{
         doc.add(new Field("content", content, type));
         // Añadimos el documento al indice
         builder.addDocument(doc);
+    }
+    
+    
+        private void createModulo(String indexPath) throws IOException{
+            this.index= new LuceneIndex(indexPath);
+            int numDocs= index.getIndex().numDocs();
+            float sumaParcial=0;
+            float modulo = 0;
+            
+            modulos= new HashMap<>();
+
+            for(int i=0; i< numDocs; i++){
+                FreqVector allTerms= index.getDocVector(i);
+
+                for(TermFreq term: allTerms){
+                    String word= term.getTerm();
+                    
+                    long termFreq=index.getTermFreq(word, i);
+                    long docFreq= index.getDocFreq(word);
+                    float tfResult= tf(termFreq);
+                    float idfResult= idf(docFreq);
+                    sumaParcial=(float) (tfResult*idfResult);
+
+                    modulo+= (pow(sumaParcial,2)); 
+                }
+                modulo = (float) sqrt(modulo);
+                
+                modulos.put(i,modulo);
+               
+            }
+            
+        try (FileOutputStream fileOut = new FileOutputStream(Paths.get(indexPath+File.separator+"modulos.txt").toString()); ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+            out.writeObject(modulos);
+        }
+            
+            
+    }
+        
+    private float tf(double freq){
+        if(freq > 0){
+            return (float) (1+log2(freq));
+        }
+        else{
+            return 0;
+        }
+    }
+    
+    private float idf(double freq){ 
+        int numDocs=((LuceneIndex) index).getIndex().numDocs();
+        return  (float) (log2(1+numDocs/(freq+1)));
     }
     
 }

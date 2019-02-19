@@ -11,11 +11,14 @@ import es.uam.eps.bmi.search.index.lucene.LuceneIndex;
 import es.uam.eps.bmi.search.ranking.SearchRanking;
 import es.uam.eps.bmi.search.ranking.impl.ScoreDocImpl;
 import es.uam.eps.bmi.search.ranking.impl.SearchRankingImpl;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.apache.lucene.search.similarities.SimilarityBase.log2;
 
 /**
@@ -31,14 +34,19 @@ public class VSMEngine extends AbstractEngine{
     }
 
     @Override
-    public SearchRanking search(String query, int cutoff) throws IOException{
+    public SearchRanking search(String query, int cutoff) throws IOException, FileNotFoundException{
         scoreDocs = new ArrayList<>();
         int numDocs = ((LuceneIndex)index).getIndex().numDocs();
         
         queryTerms =  query.toLowerCase().split(" ");
         
         for(int i=0; i< numDocs; i++){
-            float score = getScore(i);
+            float score = 0;
+            try {
+                score = getScore(i);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(VSMEngine.class.getName()).log(Level.SEVERE, null, ex);
+            }
             if(score>0){
                 scoreDocs.add(new ScoreDocImpl(i,score));
             }
@@ -70,10 +78,14 @@ public class VSMEngine extends AbstractEngine{
     }
 
 
-    private float getScore(int docID) throws IOException {
+    private float getScore(int docID) throws IOException, FileNotFoundException, ClassNotFoundException {
         float score=0;
-        float modulo = 0;
         float sumaParcial=0;
+        HashMap<Integer, Float> modulos;
+
+        modulos = ((LuceneIndex)index).readModulo();
+        
+        float moduloParcial= modulos.get(docID);
         
         for(String queryTerm : queryTerms){
             long termFreq=index.getTermFreq(queryTerm, docID);
@@ -83,12 +95,8 @@ public class VSMEngine extends AbstractEngine{
             sumaParcial=(float) (tfResult*idfResult);
             
             score+= sumaParcial;
-            modulo+= (pow(sumaParcial,2)); 
         }
         
-        modulo= (float)sqrt(modulo);
-        
-        //controlar el 0 del modulo
-        return score/modulo;
+        return (moduloParcial>0)? (score/moduloParcial): score;
     }
 }

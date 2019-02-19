@@ -34,6 +34,8 @@ public class TestEngine {
         testCollection ("src/es/uam/eps/bmi/search/ranking/", "index/src", "size", "public abstract");
         testCollection ("collections/docs1k.zip", "index/docs", "seat", "obama family tree");
         testCollection ("collections/urls.txt", "index/urls", "wikipedia", "information probability");
+        //testCollection ("collections/prueba", "index/src", "size", "liga street hockey");
+
     }
     
     static void testCollection(String collectionPath, String indexPath, String word, String query) throws IOException {
