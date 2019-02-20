@@ -1,16 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * 
+ * Fichero LuceneBuilder.java que incluye el constructor de Lucene.
+ * 
+ * 
+ * @version 1.0
+ * 
+ * Created on 10/02/2019  
  */
 package es.uam.eps.bmi.search.index.lucene;
 
 import es.uam.eps.bmi.search.index.IndexBuilder;
 import es.uam.eps.bmi.search.index.freq.FreqVector;
 import es.uam.eps.bmi.search.index.freq.TermFreq;
-import es.uam.eps.bmi.search.vsm.VSMEngine;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,7 +23,6 @@ import java.io.ObjectOutputStream;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -46,8 +47,12 @@ import org.jsoup.Jsoup;
 
 
 /**
+ * Clase que implementa a la interfaz de IndexBuilder y se encargara
+ * de la construccion de un indice dado una serie de archivos y directorios.
  *
- * @author e341058
+ * @author Miguel Alvarez Lesmes
+ * @author Sergio Romero Tapiador
+ * 
  */
 public class LuceneBuilder implements IndexBuilder{
     
@@ -56,7 +61,15 @@ public class LuceneBuilder implements IndexBuilder{
     private Map<Integer, Float> modulos;
 
     
-    
+    /**
+     * Crea el indice de Lucene.
+     * 
+     * @param collectionPath el path de la coleccion de documentos
+     * 
+     * @param indexPath el path donde queremos insertar nuestro indice
+     * 
+     * @throws IOException 
+     */
     @Override
     public void build(String collectionPath, String indexPath) throws IOException {
         Directory directory = FSDirectory.open(Paths.get(indexPath));
@@ -142,11 +155,25 @@ public class LuceneBuilder implements IndexBuilder{
             }   
         
         }
+        //cerramos el indice creado y calculamos el modulo de cada documento
         builder.close();
         createModulo(indexPath);
         
     }
     
+    /**
+     * 
+     * Funcion comun a los tres tipos diferentes de elementos que manejaremos, en la 
+     * cual añadimos al indice los diferentes documentos leidos.
+     * 
+     * @param content el contenido que incluiremos en el indice
+     * 
+     * @param path el path donde queremos guardarlo
+     * 
+     * @param builder el objeto que nos ayudara a crear el indice
+     * 
+     * @throws IOException 
+     */
     public void addToIndex(String content, String path,IndexWriter builder) throws IOException{
 
         // Creamos un documento por cada entrada en la lista content
@@ -162,35 +189,50 @@ public class LuceneBuilder implements IndexBuilder{
         builder.addDocument(doc);
     }
     
-    
-        private void createModulo(String indexPath) throws IOException{
-            this.index= new LuceneIndex(indexPath);
-            int numDocs= index.getIndex().numDocs();
-            float sumaParcial=0;
-            float modulo = 0;
-            
-            modulos= new HashMap<>();
+    /**
+     * 
+     * Calculara todos los modulos de los documentos en el indice actual
+     * 
+     * @param indexPath el path donde se encuentra el indice
+     * 
+     * @throws IOException 
+     */
+    private void createModulo(String indexPath) throws IOException{
+        this.index= new LuceneIndex(indexPath);
+        int numDocs= index.getIndex().numDocs();
+        float sumaParcial=0;
+        float modulo = 0;
 
-            for(int i=0; i< numDocs; i++){
-                FreqVector allTerms= index.getDocVector(i);
+        //creamos un HashMap donde guardaremos el ID del documento junto con 
+        //su modulo previamente calculado
+        modulos= new HashMap<>();
 
-                for(TermFreq term: allTerms){
-                    String word= term.getTerm();
-                    
-                    long termFreq=index.getTermFreq(word, i);
-                    long docFreq= index.getDocFreq(word);
-                    float tfResult= tf(termFreq);
-                    float idfResult= idf(docFreq);
-                    sumaParcial=(float) (tfResult*idfResult);
+        //por cada documento del indice
+        for(int i=0; i< numDocs; i++){
+            FreqVector allTerms= index.getDocVector(i);
 
-                    modulo+= (pow(sumaParcial,2)); 
-                }
-                modulo = (float) sqrt(modulo);
+            //por cada termino del documento i
+            for(TermFreq term: allTerms){
+                String word= term.getTerm();
                 
-                modulos.put(i,modulo);
-               
+                //calculamos el tf y el idf
+                long termFreq=index.getTermFreq(word, i);
+                long docFreq= index.getDocFreq(word);
+                float tfResult= tf(termFreq);
+                float idfResult= idf(docFreq);
+                sumaParcial=(float) (tfResult*idfResult);
+
+                //calculamos la suma parcial de los terminos al cuadrado
+                modulo+= (pow(sumaParcial,2)); 
             }
             
+            //finalmente calculamos la raiz y lo añadimos al HashMap
+            modulo = (float) sqrt(modulo);
+            modulos.put(i,modulo);
+
+        }
+
+        //por ultimo, lo escribimos en un fichero para su posterior lectura
         try (FileOutputStream fileOut = new FileOutputStream(Paths.get(indexPath+File.separator+"modulos.txt").toString()); ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
             out.writeObject(modulos);
         }
@@ -198,6 +240,14 @@ public class LuceneBuilder implements IndexBuilder{
             
     }
         
+    /**
+     * 
+     * Calcula el tf dado una frecuencia de un termino
+     * 
+     * @param freq la frecuencia de un termino
+     * 
+     * @return la probabilidad del termino en el documento
+     */
     private float tf(double freq){
         if(freq > 0){
             return (float) (1+log2(freq));
@@ -207,6 +257,13 @@ public class LuceneBuilder implements IndexBuilder{
         }
     }
     
+    /**
+     * Calcula el idf dado una frecuencia de un termino
+     * 
+     * @param freq la frecuencia de un termino
+     * 
+     * @return la probabilidad del termino en el indice
+     */
     private float idf(double freq){ 
         int numDocs=((LuceneIndex) index).getIndex().numDocs();
         return  (float) (log2(1+numDocs/(freq+1)));
